@@ -1,5 +1,48 @@
 import os
 
+# 需要忽略的目录和文件列表
+IGNORE_PATTERNS = {
+    # 隐藏目录/文件（以点开头）
+    ".",
+    # Git 相关
+    ".git", ".gitignore", ".gitattributes", ".gitmodules",
+    # IDE 相关
+    ".idea", ".vscode", ".vs", "*.swp", "*.swo",
+    # Python 相关
+    "__pycache__", "*.pyc", "*.pyo", "*.pyd", ".pytest_cache",
+    ".mypy_cache", ".tox", ".coverage", ".coverage.*",
+    # 虚拟环境
+    "venv", "env", ".venv", ".env",
+    # 构建产物
+    "build", "dist", "*.egg-info",
+    # Node.js
+    "node_modules",
+    # 系统文件
+    ".DS_Store", "Thumbs.db",
+    # 项目特定
+    "*.log", "*.tmp", ".cache",
+}
+
+def should_ignore(name):
+    """判断是否应该忽略该文件或目录"""
+    name_lower = name.lower()
+
+    # 隐藏文件/目录（以点开头）
+    if name.startswith("."):
+        return True
+
+    # 检查扩展名匹配
+    for pattern in IGNORE_PATTERNS:
+        if pattern.startswith("*"):
+            # 扩展名匹配
+            if name_lower.endswith(pattern[1:].lower()):
+                return True
+        elif name == pattern:
+            return True
+
+    return False
+
+
 def print_tree(root_path, prefix="", is_last=True):
     """递归打印目录树"""
     # 获取路径的显示名
@@ -14,7 +57,11 @@ def print_tree(root_path, prefix="", is_last=True):
     # 如果是目录，递归处理子项
     if os.path.isdir(root_path):
         try:
-            entries = sorted(os.listdir(root_path), key=lambda x: (not os.path.isdir(os.path.join(root_path, x)), x))
+            # 过滤并排序
+            entries = sorted(
+                (e for e in os.listdir(root_path) if not should_ignore(e)),
+                key=lambda x: (not os.path.isdir(os.path.join(root_path, x)), x)
+            )
         except PermissionError:
             print(f"{prefix}    [权限拒绝]")
             return
