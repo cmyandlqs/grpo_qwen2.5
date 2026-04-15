@@ -115,8 +115,13 @@ class GSM8KEvaluator:
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_path,
             trust_remote_code=True,
-            use_fast=False
+            use_fast=False,
+            padding_side='left'  # decoder-only 架构需要左侧 padding
         )
+        # 设置 pad_token（如果不存在）
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+
         self.log(f"✓ Tokenizer 已加载")
         self.log(f"  词汇表大小: {len(self.tokenizer)}")
 
