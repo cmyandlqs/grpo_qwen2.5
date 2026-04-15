@@ -1,0 +1,59 @@
+# 通用Git忽略文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.env
+.venv/
+.vscode/
+.idea/
+*.log
+*.tmp
+*.temp
+.DS_Store
+*.swp
+*.swo
+.lingma_storage
+.lingma_storage
+.configs
+.ipynb_checkpoints
+# 数据集文件夹
+dataset_eval/
+
+# 模型文件夹（全部忽略）
+models/
+qwen2.5-0.5B-base/
+qwen2.5-0.5B-Instruct/
+qwen2.5-3B-Instruct/
+
+# 输出文件夹
+output/
+
+# 大模型权重/二进制文件
+*.bin
+*.safetensors
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.hdf5
+*.onnx
+*.model
+*.pkl
+*.pickle
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# 日志与缓存
+wandb/
+runs/
+checkpoints/
+*.out
+*.err
