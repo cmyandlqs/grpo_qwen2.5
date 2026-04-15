@@ -18,11 +18,32 @@ python tests/run_gsm8k_eval.py \
 准确率: ~10-20%  (base 模型未经指令微调)
 ```
 
-### 2. GRPO 训练
+### 2. GRPO 训练（两种方式）
+
+#### 方式 A: 基础训练（无监控）
 
 ```bash
 # 运行训练脚本
 bash scripts/train_grpo_gsm8k.sh
+```
+
+#### 方式 B: 使用 SwanLab 监控（推荐）⭐
+
+```bash
+# 1. 安装 SwanLab
+pip install swanlab
+
+# 2. 获取 API Key
+# 访问 https://swanlab.cn/ 注册
+
+# 3. 设置 API Key
+export SWANLAB_API_KEY="your-api-key"
+
+# 4. 运行训练（带实时监控）
+bash scripts/train_grpo_gsm8k_swlab.sh
+
+# 5. 打开浏览器查看
+# https://swanlab.cn
 ```
 
 **预期时间**：4-8 小时（A100 GPU，1 epoch）

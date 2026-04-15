@@ -241,6 +241,47 @@ tail -f /mnt/workspace/output/grpo_qwen2.5_0.5b_gsm8k/logs/trainer.log
 - `value_loss`: 价值损失（GRPO 中为 0）
 - `learning_rate`: 学习率
 
+### 5.3 使用 SwanLab 实时监控（推荐）
+
+**为什么使用 SwanLab？**
+- 🇨🇳 国产平台，访问快速
+- 📊 实时可视化训练曲线
+- 🔄 支持多实验对比
+- 💾 云端存储，随时查看
+
+**快速配置**：
+
+1. **安装 SwanLab**：
+```bash
+pip install swanlab
+```
+
+2. **获取 API Key**：
+   - 访问 https://swanlab.cn/
+   - 注册并获取 API Key
+
+3. **使用 SwanLab 版本训练脚本**：
+```bash
+# 设置 API Key
+export SWANLAB_API_KEY="your-api-key"
+
+# 运行训练
+bash scripts/train_grpo_gsm8k_swlab.sh
+```
+
+**在 SwanLab 中监控**：
+
+打开 https://swanlab.cn/ 查看：
+
+| 指标 | 说明 | 期望趋势 |
+|------|------|---------|
+| `train/reward` | 训练奖励 | ⬆️ 持续上升 |
+| `train/policy_loss` | 策略损失 | ⬇️ 下降后稳定 |
+| `train/reward/accuracy` | 准确率奖励 | ⬆️ 上升 |
+| `train/grad_norm` | 梯度范数 | ➡️ 保持稳定 |
+
+**详细监控指南**：查看 `docs/GRPO_Monitoring_Guide.md`
+
 ---
 
 ## 6. 评估与对比
