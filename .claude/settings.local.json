@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(export TAVILY_API_KEY=\"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\")",
+      "Read(//c/Users/sikm/.claude/skills/agent-tavily-search/**)",
+      "Bash(python scripts/tavily_search.py --query \"ms-swift GRPO training Qwen mathematical reasoning GSM8K\" --max-results 10 --format md)",
+      "Bash(python scripts/tavily_search.py --query \"ms-swift GRPO command line parameters num_generations reward_funcs\" --max-results 5 --format md)",
+      "Bash(python scripts/tavily_search.py --query \"DeepSeek R1 GRPO training reasoning chain of thought mathematical\" --max-results 5 --format md)"
+    ]
+  }
+}
