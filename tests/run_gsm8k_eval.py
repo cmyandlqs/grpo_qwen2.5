@@ -164,8 +164,17 @@ class GSM8KEvaluator:
 
             # 限制测试样本数
             if self.config['num_samples'] > 0:
-                dataset = dataset[:self.config['num_samples']]
+                # Dataset 切片返回字典，需要转换
+                sliced = dataset[:self.config['num_samples']]
+                # 将字典转换为列表
+                dataset = [
+                    {key: values[i] for key, values in sliced.items()}
+                    for i in range(len(list(sliced.values())[0]))
+                ]
                 self.log(f"  限制测试样本数: {len(dataset)}")
+            else:
+                # 转换整个数据集为列表
+                dataset = [dict(item) for item in dataset]
 
             self.log("")
             return dataset
