@@ -128,10 +128,11 @@ def main():
     print(f"✓ 数据集大小: {len(dataset)}")
 
     # 定义不同的 prompt 模板
+    # 注意：format() 中需要转义的大括号用 {{}}
     prompt_templates = {
         "原始格式(无system)": "<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assistant\n",
         "标准格式(有system)": "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assistant\n",
-        "CoT格式": "<|im_start|>system\nYou are a helpful assistant. Please think step by step and put your final answer within \\boxed{}.<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assistant\n",
+        "CoT格式": "<|im_start|>system\nYou are a helpful assistant. Please think step by step and put your final answer within \\boxed{{}}.<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assistant\n",
     }
 
     # 测试每个配置
