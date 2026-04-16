@@ -9,7 +9,13 @@ set -e
 # ============================================
 
 MODEL_PATH="/mnt/workspace/qwen2.5-0.5B-base"
-DATA_PATH="/mnt/workspace/dataset_eval/gsm8k_data"
+
+# 原始数据集路径（arrow格式）
+RAW_DATA_PATH="/mnt/workspace/dataset_eval/gsm8k_data"
+
+# 转换后的GRPO格式数据集（JSONL）
+DATA_PATH="/mnt/workspace/dataset_eval/gsm8k_grpo_train.jsonl"
+
 OUTPUT_DIR="/mnt/workspace/output/grpo_benchmark"
 
 # 测试参数
@@ -58,6 +64,70 @@ fi
 echo "✓ 找到训练脚本: $RLHF_SCRIPT"
 echo ""
 
+# ============================================
+# 数据集转换（如果需要）
+# ============================================
+
+echo "检查数据集格式..."
+
+if [ ! -f "$DATA_PATH" ]; then
+    echo "GRPO格式数据集不存在，正在转换..."
+
+    # 创建转换脚本（临时）
+    cat > /tmp/convert_gsm8k.py << 'EOF'
+#!/usr/bin/env python3
+import sys
+import json
+import re
+from pathlib import Path
+
+try:
+    from datasets import load_from_disk
+except ImportError:
+    print("错误: 需要安装 datasets 库")
+    sys.exit(1)
+
+def extract_answer(answer):
+    match = re.search(r'####\s*(\d+(?:\.\d+)?)', answer)
+    if match:
+        return match.group(1)
+    numbers = re.findall(r'\d+(?:\.\d+)?', answer)
+    if numbers:
+        return numbers[-1]
+    return answer.strip()
+
+raw_path = sys.argv[1]
+output_path = sys.argv[2]
+
+print(f"加载: {raw_path}")
+dataset = load_from_disk(raw_path)
+if hasattr(dataset, 'keys'):
+    dataset = dataset['train']
+
+print(f"样本数: {len(dataset)}")
+
+with open(output_path, 'w', encoding='utf-8') as f:
+    for item in dataset:
+        solution = extract_answer(item.get('answer', ''))
+        data = {
+            "messages": [{"role": "user", "content": item.get('question', '')}],
+            "solution": solution
+        }
+        f.write(json.dumps(data, ensure_ascii=False) + '\n')
+
+print(f"✓ 保存: {output_path}")
+EOF
+
+    python /tmp/convert_gsm8k.py "$RAW_DATA_PATH" "$DATA_PATH"
+    rm /tmp/convert_gsm8k.py
+
+    echo "✓ 数据集转换完成"
+else
+    echo "✓ GRPO格式数据集已存在"
+fi
+
+echo ""
+
 # 表头
 printf "%-18s | %-12s | %-12s | %-15s | %-15s\n" "配置" "最大显存(GB)" "平均显存(GB)" "测试时间(秒)" "估算完整时间"
 echo "-----------------------------------------------------------------------------------------------------"
@@ -86,7 +156,6 @@ for num_gen in "${TEST_NUM_GENERATIONS[@]}"; do
             --model_type qwen2 \
             --template qwen2_5 \
             --dataset "$DATA_PATH" \
-            --dataset_num_proc 1 \
             --tuner_type lora \
             --lora_rank 64 \
             --lora_alpha 128 \
