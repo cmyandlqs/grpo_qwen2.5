@@ -83,14 +83,14 @@ for num_gen in "${TEST_NUM_GENERATIONS[@]}"; do
             "$RLHF_SCRIPT" \
             --rlhf_type grpo \
             --model "$MODEL_PATH" \
-            --model_type qwen2.5 \
+            --model_type qwen2 \
             --dataset "$DATA_PATH" \
             --dataset_num_proc 1 \
-            --train_type lora \
+            --tuner_type lora \
             --lora_rank 64 \
             --lora_alpha 128 \
             --lora_target_modules all \
-            --torch_dtype bfloat16 \
+            --dtype bfloat16 \
             --use_vllm true \
             --vllm_mode colocate \
             --num_generations $num_gen \
