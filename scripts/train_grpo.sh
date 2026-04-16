@@ -20,7 +20,7 @@ OUTPUT_DIR="/mnt/workspace/output/grpo_qwen2.5_0.5b_$(date +%Y%m%d_%H%M%S)"
 # GRPO 核心参数
 # ============================================
 
-NUM_GENERATIONS=8         # G 值：每个 prompt 生成几个输出（推荐 8）
+NUM_GENERATIONS=4         # G 值：每个 prompt 生成几个输出（推荐 8）
 REWARD_FUNCS="accuracy"   # 奖励函数：accuracy（准确率）
 TEMPERATURE=1.0          # 采样温度
 
@@ -42,7 +42,7 @@ LORA_ALPHA=128            # LoRA alpha
 
 # 获取 API Key: https://swanlab.cn/
 # 留空则不使用 SwanLab
-SWANLAB_KEY=""
+SWANLAB_KEY="INxp6ym1fOllPByTREaiD"
 
 SWANLAB_PROJECT="GRPO-Qwen-GSM8K"
 SWANLAB_RUN="qwen-0.5b-$(date +%Y%m%d_%H%M%S)"
