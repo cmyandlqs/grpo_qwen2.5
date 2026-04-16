@@ -11,7 +11,7 @@ MODEL_PATH="/mnt/workspace/qwen2.5-0.5B-base"
 MODEL_TYPE="qwen2.5"
 
 # 数据路径
-DATA_PATH="/mnt/workspace/dataset_eval/gsm8k_data"
+DATA_PATH="/mnt/workspace/dataset_eval/gsm8k_grpo_train.jsonl"
 
 # 输出路径（自动添加时间戳）
 OUTPUT_DIR="/mnt/workspace/output/grpo_qwen2.5_0.5b_$(date +%Y%m%d_%H%M%S)"
@@ -77,6 +77,69 @@ if [ -n "$SWANLAB_KEY" ]; then
     echo "✓ SwanLab 已启用"
 fi
 
+# ============================================
+# 数据集转换（如果需要）
+# ============================================
+
+RAW_DATA_PATH="/mnt/workspace/dataset_eval/gsm8k_data"
+
+if [ ! -f "$DATA_PATH" ]; then
+    echo "⚠️  GRPO格式数据集不存在，正在转换..."
+    echo "   原始数据: $RAW_DATA_PATH"
+    echo "   输出文件: $DATA_PATH"
+
+    # 使用转换脚本
+    if [ -f "utils/convert_gsm8k_to_grpo.py" ]; then
+        python utils/convert_gsm8k_to_grpo.py \
+            --input "$RAW_DATA_PATH" \
+            --output "$DATA_PATH" \
+            --split train
+    else
+        # 内嵌转换逻辑
+        python -c "
+import sys
+import json
+import re
+from datasets import load_from_disk
+
+def extract_answer(answer):
+    match = re.search(r'####\s*(\d+(?:\.\d+)?)', answer)
+    if match:
+        return match.group(1)
+    numbers = re.findall(r'\d+(?:\.\d+)?', answer)
+    return numbers[-1] if numbers else answer.strip()
+
+dataset = load_from_disk('$RAW_DATA_PATH')
+if hasattr(dataset, 'keys'):
+    dataset = dataset['train']
+
+print(f'转换 {len(dataset)} 个样本...')
+
+with open('$DATA_PATH', 'w', encoding='utf-8') as f:
+    for item in dataset:
+        solution = extract_answer(item.get('answer', ''))
+        data = {
+            'messages': [{'role': 'user', 'content': item.get('question', '')}],
+            'solution': solution
+        }
+        f.write(json.dumps(data, ensure_ascii=False) + '\n')
+
+print(f'✓ 保存到: $DATA_PATH')
+"
+    fi
+
+    if [ $? -eq 0 ]; then
+        echo "✓ 数据集转换完成"
+    else
+        echo "❌ 数据集转换失败"
+        exit 1
+    fi
+else
+    echo "✓ GRPO格式数据集已存在: $DATA_PATH"
+fi
+
+echo ""
+
 # 获取 ms-swift rlhf.py 路径
 RLHF_SCRIPT=$(python -c 'import swift; import os; print(os.path.dirname(swift.__file__) + "/cli/rlhf.py")')
 
@@ -94,6 +157,7 @@ python -m torch.distributed.run \
     --lora_target_modules all \
     --torch_dtype bfloat16 \
     --use_vllm true \
+    --vllm_mode colocate \
     --vllm_gpu_memory_utilization 0.4 \
     --num_generations $NUM_GENERATIONS \
     --reward_funcs $REWARD_FUNCS \
