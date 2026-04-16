@@ -90,8 +90,6 @@ for num_gen in "${TEST_NUM_GENERATIONS[@]}"; do
             --tuner_type lora \
             --lora_rank 64 \
             --lora_alpha 128 \
-            --lora_target_modules all \
-            --dtype bfloat16 \
             --use_vllm true \
             --vllm_mode colocate \
             --num_generations $num_gen \
