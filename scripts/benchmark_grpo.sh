@@ -18,9 +18,13 @@ DATA_PATH="/mnt/workspace/dataset_eval/gsm8k_grpo_train.jsonl"
 
 OUTPUT_DIR="/mnt/workspace/output/grpo_benchmark"
 
-# 测试参数
-TEST_NUM_GENERATIONS=(4 8 16)
-TEST_BATCH_SIZES=(8 16)
+# 测试参数（按显存占用从小到大）
+# 格式: NUM_GENERATIONS,BATCH_SIZE
+TEST_CONFIGS=(
+    "8,2"    # 配置1: gen=8, batch=2 (显存最小)
+    "4,4"    # 配置2: gen=4, batch=4 (显存中等)
+    "8,4"    # 配置3: gen=8, batch=4 (显存较大)
+)
 
 # 快速测试配置
 SAMPLE_SIZE=100              # 测试样本数（用于估算完整训练时间）
@@ -43,11 +47,14 @@ echo "=========================================="
 echo "GRPO 参数快速测试"
 echo "=========================================="
 echo "模型: $MODEL_PATH"
-echo "数据: $DATA_PATH (样本数: $SAMPLE_SIZE)"
+echo "数据: $DATA_PATH"
+echo "vLLM 利用率: 0.9 (默认)"
 echo ""
-echo "测试配置:"
-echo "  NUM_GENERATIONS: ${TEST_NUM_GENERATIONS[@]}"
-echo "  BATCH_SIZE: ${TEST_BATCH_SIZES[@]}"
+echo "测试配置 (按显存占用从小到大):"
+for config in "${TEST_CONFIGS[@]}"; do
+    IFS=',' read -r num_gen batch_size <<< "$config"
+    echo "  - gen=$num_gen, batch=$batch_size"
+done
 echo ""
 echo "=========================================="
 echo ""
@@ -132,9 +139,9 @@ echo ""
 printf "%-18s | %-12s | %-12s | %-15s | %-15s\n" "配置" "最大显存(GB)" "平均显存(GB)" "测试时间(秒)" "估算完整时间"
 echo "-----------------------------------------------------------------------------------------------------"
 
-# 遍历所有配置组合
-for num_gen in "${TEST_NUM_GENERATIONS[@]}"; do
-    for batch_size in "${TEST_BATCH_SIZES[@]}"; do
+# 遍历所有配置
+for config in "${TEST_CONFIGS[@]}"; do
+    IFS=',' read -r num_gen batch_size <<< "$config"
 
         config_name="G${num_gen}_B${batch_size}"
         test_output="$OUTPUT_DIR/$config_name"
@@ -255,7 +262,6 @@ for num_gen in "${TEST_NUM_GENERATIONS[@]}"; do
         fi
 
         echo "" >&2
-    done
 done
 
 echo ""
