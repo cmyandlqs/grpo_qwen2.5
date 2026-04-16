@@ -84,6 +84,7 @@ for num_gen in "${TEST_NUM_GENERATIONS[@]}"; do
             --rlhf_type grpo \
             --model "$MODEL_PATH" \
             --model_type qwen2 \
+            --template qwen2_5 \
             --dataset "$DATA_PATH" \
             --dataset_num_proc 1 \
             --tuner_type lora \
