@@ -20,7 +20,7 @@ OUTPUT_DIR="/mnt/workspace/output/grpo_qwen2.5_0.5b_$(date +%Y%m%d_%H%M%S)"
 # GRPO 核心参数
 # ============================================
 
-NUM_GENERATIONS=4         # G 值：每个 prompt 生成几个输出（推荐 8）
+NUM_GENERATIONS=4         # G 值：每个 prompt 生成几个输出
 REWARD_FUNCS="accuracy"   # 奖励函数：accuracy（准确率）
 TEMPERATURE=1.0          # 采样温度
 
@@ -94,6 +94,7 @@ python -m torch.distributed.run \
     --lora_target_modules all \
     --torch_dtype bfloat16 \
     --use_vllm true \
+    --vllm_gpu_memory_utilization 0.4 \
     --num_generations $NUM_GENERATIONS \
     --reward_funcs $REWARD_FUNCS \
     --temperature $TEMPERATURE \
