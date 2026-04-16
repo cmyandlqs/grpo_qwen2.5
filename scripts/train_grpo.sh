@@ -8,7 +8,7 @@
 
 # 模型配置
 MODEL_PATH="/mnt/workspace/qwen2.5-0.5B-base"
-MODEL_TYPE="qwen2.5"
+MODEL_TYPE="qwen2"
 
 # 数据路径
 DATA_PATH="/mnt/workspace/dataset_eval/gsm8k_grpo_train.jsonl"
@@ -150,12 +150,12 @@ python -m torch.distributed.run \
     --rlhf_type grpo \
     --model $MODEL_PATH \
     --model_type $MODEL_TYPE \
+    --template qwen2_5 \
     --dataset $DATA_PATH \
-    --train_type lora \
+    --tuner_type lora \
     --lora_rank $LORA_RANK \
     --lora_alpha $LORA_ALPHA \
-    --lora_target_modules all \
-    --torch_dtype bfloat16 \
+    --dtype bfloat16 \
     --use_vllm true \
     --vllm_mode colocate \
     --vllm_gpu_memory_utilization 0.4 \
