@@ -155,7 +155,7 @@ python -m torch.distributed.run \
     --tuner_type lora \
     --lora_rank $LORA_RANK \
     --lora_alpha $LORA_ALPHA \
-    --dtype bfloat16 \
+    --torch_dtype bfloat16 \
     --use_vllm true \
     --vllm_mode colocate \
     --vllm_gpu_memory_utilization 0.4 \
@@ -171,8 +171,6 @@ python -m torch.distributed.run \
     --logging_dir $OUTPUT_DIR/logs \
     --gradient_checkpointing true \
     --report_to $REPORT_TO \
-    --project_name $SWANLAB_PROJECT \
-    --run_name $SWANLAB_RUN \
     --logging_steps 10 \
     --save_steps 500 \
     --save_total_limit 3
