@@ -22,9 +22,8 @@ OUTPUT_DIR="/mnt/workspace/output/grpo_benchmark"
 # 约束: BATCH_SIZE 必须能被 NUM_GENERATIONS 整除
 # 格式: NUM_GENERATIONS,BATCH_SIZE
 TEST_CONFIGS=(
-    "4,4"    # 配置1: gen=4, batch=4 (显存最小 ~7GB)
-    "4,8"    # 配置2: gen=4, batch=8 (显存中等 ~10GB)
-    "8,8"    # 配置3: gen=8, batch=8 (显存较大 ~14GB)
+    "2,2"    # 配置1: gen=2, batch=2 (显存最小 ~3GB) ⚠️ gen小效果差
+    "4,4"    # 配置2: gen=4, batch=4 (显存中等 ~5GB) 推荐
 )
 
 # 快速测试配置
@@ -49,7 +48,7 @@ echo "GRPO 参数快速测试"
 echo "=========================================="
 echo "模型: $MODEL_PATH"
 echo "数据: $DATA_PATH"
-echo "vLLM 利用率: 0.9 (默认)"
+echo "vLLM GPU 利用率: 0.4 (降低显存占用)"
 echo ""
 echo "测试配置 (按显存占用从小到大):"
 echo "  约束: BATCH_SIZE 必须能被 NUM_GENERATIONS 整除"
@@ -170,6 +169,7 @@ for config in "${TEST_CONFIGS[@]}"; do
             --lora_alpha 128 \
             --use_vllm true \
             --vllm_mode colocate \
+            --vllm_gpu_memory_utilization 0.4 \
             --num_generations $num_gen \
             --reward_funcs accuracy \
             --per_device_train_batch_size $batch_size \
