@@ -19,11 +19,12 @@ DATA_PATH="/mnt/workspace/dataset_eval/gsm8k_grpo_train.jsonl"
 OUTPUT_DIR="/mnt/workspace/output/grpo_benchmark"
 
 # 测试参数（按显存占用从小到大）
+# 约束: BATCH_SIZE 必须能被 NUM_GENERATIONS 整除
 # 格式: NUM_GENERATIONS,BATCH_SIZE
 TEST_CONFIGS=(
-    "8,2"    # 配置1: gen=8, batch=2 (显存最小)
-    "4,4"    # 配置2: gen=4, batch=4 (显存中等)
-    "8,4"    # 配置3: gen=8, batch=4 (显存较大)
+    "4,4"    # 配置1: gen=4, batch=4 (显存最小 ~7GB)
+    "4,8"    # 配置2: gen=4, batch=8 (显存中等 ~10GB)
+    "8,8"    # 配置3: gen=8, batch=8 (显存较大 ~14GB)
 )
 
 # 快速测试配置
@@ -51,6 +52,7 @@ echo "数据: $DATA_PATH"
 echo "vLLM 利用率: 0.9 (默认)"
 echo ""
 echo "测试配置 (按显存占用从小到大):"
+echo "  约束: BATCH_SIZE 必须能被 NUM_GENERATIONS 整除"
 for config in "${TEST_CONFIGS[@]}"; do
     IFS=',' read -r num_gen batch_size <<< "$config"
     echo "  - gen=$num_gen, batch=$batch_size"
