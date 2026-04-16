@@ -92,7 +92,7 @@ for num_gen in "${TEST_NUM_GENERATIONS[@]}"; do
             --lora_target_modules all \
             --torch_dtype bfloat16 \
             --use_vllm true \
-            --vllm_mode all \
+            --vllm_mode server \
             --num_generations $num_gen \
             --reward_funcs accuracy \
             --per_device_train_batch_size $batch_size \
